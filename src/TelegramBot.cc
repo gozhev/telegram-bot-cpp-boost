@@ -5,25 +5,39 @@
 #include <regex>
 #include <sstream>
 
-#include <Poco/Base64Encoder.h>
-#include <Poco/Data/MySQL/MySQLException.h>
-#include <Poco/Data/RecordSet.h>
-#include <Poco/Exception.h>
-#include <Poco/Random.h>
-#include <Poco/TextEncoding.h>
-#include <Poco/TextIterator.h>
-#include <Poco/Util/PropertyFileConfiguration.h>
-
 #include <libmemcached/memcached.h>
 
-namespace p = ::Poco;
-namespace p_json = ::Poco::JSON;
-namespace p_net = ::Poco::Net;
-namespace p_dyn = ::Poco::Dynamic;
-namespace p_util = ::Poco::Util;
-namespace p_data = ::Poco::Data;
-namespace p_kw = ::Poco::Data::Keywords;
+#include <boost/program_options.hpp>
 
+namespace b = ::boost;
+namespace b_po = ::boost::program_options;
+
+namespace gozhev {
+namespace telegram_bot {
+
+static constexpr char const* API_URL = "https://api.telegram.org";
+static constexpr char const* EMOJI_NUMBERS[] = {
+	"0️⃣", "1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟"};
+static constexpr char const* DAY_NAMES[] = {"ПН", "ВТ", "СР", "ЧТ", "ПТ", "СБ", "ВС"};
+static constexpr char const* MONTH_NAMES[] = {
+	"Январь", "Февраль", "Март", "Апрель", "Май", "Июнь",
+	"Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"};
+static constexpr int DAYS_PER_WEEK = 7;
+
+Options::Options(int argv, char** argc, Error& error) noexcept
+{
+	(void) argv;
+	(void) argc;
+	(void) error;
+}
+
+Bot::Bot(Options options, Error& error) noexcept :
+	options_(::std::move(options))
+{
+	(void) error;
+}
+
+#if 0
 TelegramBot::TelegramBot(Error& error) noexcept
 try {
 	auto conf = p_util::AbstractConfiguration::Ptr{
@@ -1205,5 +1219,9 @@ bool TelegramBot::CallbackData::Parse(::std::string_view s)
 
 	return true;
 }
+#endif
+
+} // ns telegram_bot
+} // ns gozhev
 
 // vim: set ts=4 sw=4 noet :

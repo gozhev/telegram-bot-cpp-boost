@@ -10,53 +10,40 @@
 #include <unordered_set>
 #include <vector>
 
-#include <Poco/Data/MySQL/Connector.h>
-#include <Poco/Data/Session.h>
-#include <Poco/Dynamic/Var.h>
-#include <Poco/Exception.h>
-#include <Poco/JSON/JSON.h>
-#include <Poco/JSON/Object.h>
-#include <Poco/JSON/Parser.h>
-#include <Poco/JSON/Stringifier.h>
-#include <Poco/Net/AcceptCertificateHandler.h>
-#include <Poco/Net/Context.h>
-#include <Poco/Net/HTTPMessage.h>
-#include <Poco/Net/HTTPRequest.h>
-#include <Poco/Net/HTTPResponse.h>
-#include <Poco/Net/HTTPSClientSession.h>
-#include <Poco/Net/HTTPSStreamFactory.h>
-#include <Poco/Net/InvalidCertificateHandler.h>
-#include <Poco/Net/SSLManager.h>
-#include <Poco/StreamCopier.h>
-#include <Poco/URI.h>
-#include <Poco/URIStreamOpener.h>
+namespace gozhev {
+namespace telegram_bot {
 
-class TelegramBot {
+using Error = bool;
+
+struct Options {
+	Options(int argv, char** argc, Error& error) noexcept;
+	Options(Options&& options) noexcept = default;
+	Options() noexcept = default;
+	::std::string api_token{};
+	::std::string db_host{};
+	::std::string db_port{};
+	::std::string db_database{};
+	::std::string db_user{};
+	::std::string db_password{};
+};
+
+class Bot {
 public:
-	using Error = bool;
-	static Error NoError() noexcept { return Error{false}; }
-
-	explicit TelegramBot(Error& error) noexcept;
+	explicit Bot(Options options, Error& error) noexcept;
 	template<typename T, typename = ::std::enable_if_t<noexcept(::std::declval<T>()())>>
-		void Run(T stop, Error& error) noexcept;
-
-	TelegramBot(TelegramBot const&) = delete;
-	TelegramBot& operator=(TelegramBot const&) = delete;
+	void Run(T stop, Error& error) noexcept;
+	Bot(Bot const&) = delete;
+	Bot& operator=(Bot const&) = delete;
 
 private:
-	static constexpr char const* API_URL = "https://api.telegram.org";
-	static constexpr char const* EMOJI_NUMBERS[] = {
-		"0️⃣", "1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟"};
-	static constexpr char const* DAY_NAMES[] = {"ПН", "ВТ", "СР", "ЧТ", "ПТ", "СБ", "ВС"};
-	static constexpr char const* MONTH_NAMES[] = {
-			"Январь", "Февраль", "Март", "Апрель", "Май", "Июнь",
-			"Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"};
-	static constexpr int DAYS_PER_WEEK = 7;
-
 	using ChatId = ::std::int64_t; // 52 bits at most
 	using MessageId = ChatId;
 	using CallbackQueryId = ::std::string;
 	using DateId = ::std::string;
+
+	Options options_{};
+
+#if 0
 
 	struct Date {
 		int year{};
@@ -201,18 +188,15 @@ private:
 			::std::string_view method) {
 		return ::std::string{base_url}.append("/").append(method.data());
 	}
+#endif
 };
 
-template<> ::std::string TelegramBot::Date::To() const;
-template<> ::std::tm TelegramBot::Date::To() const;
-template<> ::Poco::Data::Date TelegramBot::Date::To() const;
-
 template<typename T, typename = ::std::enable_if_t<noexcept(::std::declval<T>()())>>
-	inline void TelegramBot::Run(T stop, Error& error) noexcept
+inline void Bot::Run(T stop, Error& error) noexcept
 {
 	auto err = Error{false};
 	while (!stop()) {
-		HandleUpdates(err);
+		//HandleUpdates(err);
 		if (err) {
 			error = err;
 			break;
@@ -220,6 +204,12 @@ template<typename T, typename = ::std::enable_if_t<noexcept(::std::declval<T>()(
 	}
 	return;
 }
+
+#if 0
+template<> ::std::string TelegramBot::Date::To() const;
+template<> ::std::tm TelegramBot::Date::To() const;
+template<> ::Poco::Data::Date TelegramBot::Date::To() const;
+
 
 inline bool TelegramBot::Date::operator==(Date const& rhs) const
 {
@@ -239,5 +229,9 @@ inline ::std::size_t TelegramBot::Date::Hash::operator()(Date const& x) const
 		(::std::hash<int>()(x.month) << 1) ^
 		(::std::hash<int>()(x.day) >> 1);
 }
+#endif
+
+} // ns telegram_bot
+} // ns gozhev
 
 // vim: set ts=4 sw=4 noet :

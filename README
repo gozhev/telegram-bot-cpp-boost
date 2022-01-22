@@ -1,5 +1,6 @@
-Telegram-Bot-Cpp
-================
+Telegram-Bot-Cpp-Boost
+======================
 
 This is a bot program for the Telegram messeger. It's written in C++17 and uses
-the POCO C++ libraries. It needs a separate MySQL server as a persistent storage.
+the Boost libraries (Boost.Asio, Boost.ProgramOptions, Boost.Beast,
+Boost.MySQL). It needs a separate MySQL server as a persistent storage.
